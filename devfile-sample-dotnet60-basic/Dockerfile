@@ -2,6 +2,9 @@
 
 FROM mcr.microsoft.com/dotnet/aspnet:6.0 AS base
 WORKDIR /app
+ENV ASPNETCORE_URLS http://+:9011;https://+:9020
+EXPOSE 9011
+EXPOSE 9020
 
 FROM mcr.microsoft.com/dotnet/sdk:6.0 AS build
 WORKDIR /src
