@@ -2,15 +2,13 @@
 
 FROM mcr.microsoft.com/dotnet/aspnet:6.0 AS base
 WORKDIR /app
-EXPOSE 80
-EXPOSE 443
 
 FROM mcr.microsoft.com/dotnet/sdk:6.0 AS build
 WORKDIR /src
 COPY ["devfile-sample-dotnet60-basic/app.csproj", "devfile-sample-dotnet60-basic/"]
 COPY ["Dependency/Dependency.csproj", "Dependency/"]
 RUN dotnet restore "devfile-sample-dotnet60-basic/app.csproj"
-COPY . .
+COPY --chown=1001 . .
 WORKDIR "/src/devfile-sample-dotnet60-basic"
 RUN dotnet build "app.csproj" -c Release -o /app/build
 
@@ -18,6 +16,8 @@ FROM build AS publish
 RUN dotnet publish "app.csproj" -c Release -o /app/publish /p:UseAppHost=false
 
 FROM base AS final
+EXPOSE 8081
+ENV ASPNETCORE_URLS=http://*:8081
 WORKDIR /app
 COPY --from=publish /app/publish .
 ENTRYPOINT ["dotnet", "app.dll"]
